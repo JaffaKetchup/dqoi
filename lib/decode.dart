@@ -1,8 +1,19 @@
 import 'dart:typed_data';
 
-import 'shared/color.dart';
-import 'shared/consts.dart';
+import 'shared.dart';
 import 'qoi.dart';
+
+class Diff {
+  static const int red = 0x30;
+  static const int green = 0x0c;
+  static const int blue = 0x03;
+}
+
+class Luma {
+  static const int green = 0x3f;
+  static const int rg = 0xf0;
+  static const int bg = 0x0f;
+}
 
 QOI decode({
   required Uint8List data,
@@ -17,12 +28,13 @@ QOI decode({
   int read32() =>
       (readByte() << 24) | (readByte() << 16) | (readByte() << 8) | readByte();
 
-  if (data.lengthInBytes < headerSize + 8 || read32() != 0x716f6966) {
+  if (data.lengthInBytes < 22 || read32() != 0x716f6966) {
     throw ArgumentError(
       'Invalid QOI data\nCheck the size and header of the data are correct',
     );
   }
 
+  // Retrieve headers
   final int width = read32();
   final int height = read32();
   final int channels = readByte();
@@ -39,12 +51,12 @@ QOI decode({
   while (readIndex < data.lengthInBytes - 8) {
     final int byte = readByte();
 
-    if (byte == opRGB || byte == opRGBA) {
+    if (byte == IDTag.rgb || byte == IDTag.rgba) {
       prevColor = Color(
         readByte(),
         readByte(),
         readByte(),
-        byte == opRGBA ? readByte() : prevColor.alpha,
+        byte == IDTag.rgba ? readByte() : prevColor.alpha,
       );
 
       writeColor(prevColor);
@@ -52,34 +64,33 @@ QOI decode({
       continue;
     }
 
-    switch (byte & chunkMask) {
-      case opRUN:
-        for (int i = 0; i <= (byte & runLength); i++) {
+    switch (byte & 0xc0) {
+      case IDTag.run:
+        for (int i = 0; i <= (byte & 0x3f); i++) {
           writeColor(prevColor);
           seenPixels[prevColor.hashCode] = prevColor;
         }
         break;
-      case opINDEX:
-        writeColor(seenPixels[byte & index]);
-        prevColor = seenPixels[byte & index];
+      case IDTag.index:
+        writeColor(seenPixels[byte & 0x3f]);
+        prevColor = seenPixels[byte & 0x3f];
         break;
-      case opDIFF:
+      case IDTag.diff:
         prevColor = Color(
-          (prevColor.red + ((byte & diffRed) >> 4) - 2) & 0xff,
-          (prevColor.green + ((byte & diffGreen) >> 2) - 2) & 0xff,
-          (prevColor.blue + (byte & diffBlue) - 2) & 0xff,
+          (prevColor.red + ((byte & Diff.red) >> 4) - 2) & 0xff,
+          (prevColor.green + ((byte & Diff.green) >> 2) - 2) & 0xff,
+          (prevColor.blue + (byte & Diff.blue) - 2) & 0xff,
           prevColor.alpha,
         );
-
         writeColor(prevColor);
         seenPixels[prevColor.hashCode] = prevColor;
         break;
-      case opLUMA:
-        final dg = (byte & lumaGreen) - 32;
+      case IDTag.luma:
+        final dg = (byte & Luma.green) - 32;
 
         final byte2 = readByte();
-        final drdg = ((byte2 & lumaDiffRG) >> 4) - 8;
-        final dbdg = (byte2 & lumaDiffBG) - 8;
+        final drdg = ((byte2 & Luma.rg) >> 4) - 8;
+        final dbdg = (byte2 & Luma.bg) - 8;
 
         prevColor = Color(
           (prevColor.red + drdg + dg) & 0xff,

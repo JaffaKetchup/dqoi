@@ -23,6 +23,7 @@ void main(List<String> inputArgs) async {
     parser.addOption(
       'filename',
       abbr: 'f',
+      aliases: ['input'],
       help:
           'Path to file (including extension) to encode/decode\nOutput files are created with the same path within a \'outputs/\' directory',
       allowedHelp: {
@@ -37,18 +38,17 @@ void main(List<String> inputArgs) async {
     parser.addOption(
       'width',
       abbr: 'w',
-      help: 'Image width in pixels\nOnly required when encoding .bin format',
+      help: 'Image width in pixels\nRequired when encoding .bin format',
     );
     parser.addOption(
       'height',
       abbr: 'h',
-      help: 'Image height in pixels\nOnly required when encoding .bin format',
+      help: 'Image height in pixels\nRequired when encoding .bin format',
     );
     parser.addOption(
       'channels',
       help:
-          'Number of image channels\nMust be either 3 (RGB) or 4 (RGBA)\nOnly used when encoding .bin format',
-      defaultsTo: '4',
+          'Number of image channels\nMust be either 3 (RGB) or 4 (RGBA)\nRequired when encoding .bin format; Overrides metadata when encoding .png format',
     );
     parser.addOption(
       'colorspace',
@@ -82,25 +82,38 @@ void main(List<String> inputArgs) async {
   final String inputExtension = p.extension(args['filename']);
   final Mode mode = inputExtension == '.qoi' ? Mode.decoding : Mode.encoding;
 
-  if (mode == Mode.encoding) {
-    if (inputExtension == '.bin' &&
-        (args['width'] == null || args['height'] == null)) {
+  final bool channelsInvalid =
+      args['channels'] != '3' && args['channels'] != '4';
+  final bool colorspaceInvalid =
+      args['colorspace'] != '0' && args['colorspace'] != '1';
+
+  if (mode == Mode.encoding && inputExtension == '.bin') {
+    if (args['width'] == null || args['height'] == null) {
       print(
           'You must input a width and height to encode an image from .bin format\nFor more assistance, run \'dqoi\' with no arguments');
       return;
     }
-    if (inputExtension == '.bin' &&
-        (args['channels'] != '3' && args['channels'] != '4')) {
+    if (channelsInvalid) {
       print(
           'You must input a valid channel number (3 or 4) to encode an image from .bin format\nFor more assistance, run \'dqoi\' with no arguments');
       return;
     }
-    if (inputExtension == '.bin' &&
-        (args['colorspace'] != '0' && args['colorspace'] != '1')) {
+    if (colorspaceInvalid) {
       print(
           'You must input a valid colorspace number (0 or 1) to encode an image from .bin format\nFor more assistance, run \'dqoi\' with no arguments');
       return;
     }
+  }
+
+  if (channelsInvalid && args['channels'] != null) {
+    print(
+        'You must input a valid channel number (3 or 4) if you specify it\nFor more assistance, run \'dqoi\' with no arguments');
+    return;
+  }
+  if (colorspaceInvalid) {
+    print(
+        'You must input a valid colorspace number (0 or 1) if you specify it\nFor more assistance, run \'dqoi\' with no arguments');
+    return;
   }
 
   final File outputFile = File('outputs/' +
@@ -133,7 +146,8 @@ void main(List<String> inputArgs) async {
     data = image.getBytes();
     imageWidth = image.width;
     imageHeight = image.height;
-    channels = image.numberOfChannels;
+    channels =
+        int.tryParse(args['channels'] ?? 'null') ?? image.numberOfChannels;
     colorspace = int.tryParse(args['colorspace']) ?? 0;
   } else if (inputExtension == '.qoi') {
     data = file;
@@ -144,8 +158,8 @@ void main(List<String> inputArgs) async {
   if (mode == Mode.encoding) {
     output = encode(
       data: data,
-      imageWidth: imageWidth,
-      imageHeight: imageHeight,
+      width: imageWidth,
+      height: imageHeight,
       channels: channels,
       colorspace: colorspace,
     );
