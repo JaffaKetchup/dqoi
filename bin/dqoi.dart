@@ -2,12 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:args/args.dart';
-import 'package:dqoi/qoi.dart';
 import 'package:image/image.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:dqoi/decode.dart';
-import 'package:dqoi/encode.dart';
+import 'package:dqoi/dqoi.dart';
 
 enum Mode {
   encoding,
@@ -47,6 +45,7 @@ void main(List<String> inputArgs) async {
     );
     parser.addOption(
       'channels',
+      abbr: 'c',
       help:
           'Number of image channels\nMust be either 3 (RGB) or 4 (RGBA)\nRequired when encoding .bin format; Overrides metadata when encoding .png format',
     );
@@ -81,6 +80,11 @@ void main(List<String> inputArgs) async {
 
   final String inputExtension = p.extension(args['filename']);
   final Mode mode = inputExtension == '.qoi' ? Mode.decoding : Mode.encoding;
+  final String outputExtension = mode == Mode.encoding
+      ? '.qoi'
+      : args['bin']
+          ? '.bin'
+          : '.png';
 
   final bool channelsInvalid =
       args['channels'] != '3' && args['channels'] != '4';
@@ -116,7 +120,45 @@ void main(List<String> inputArgs) async {
     return;
   }
 
+  final Uint8List inputData = await File(args['filename']).readAsBytes();
   final File outputFile = File('outputs/' +
+      p.withoutExtension(args['filename']) +
+      (mode == Mode.encoding
+          ? '.qoi'
+          : args['bin']
+              ? '.bin'
+              : '.png'));
+
+  late final Uint8List output;
+
+  if (mode == Mode.encoding) {
+    if (inputExtension == '.png') {
+      output = QOI
+          .fromPNG(
+            inputData,
+            overrideChannels: args['channels'] == null
+                ? null
+                : int.tryParse(args['channels']) == 3
+                    ? Channels.rgb
+                    : Channels.rgba,
+            overrideColorspace: int.tryParse(args['colorspace']),
+          )
+          .toQOI();
+    } else if (inputExtension == '.bin') {
+      output = QOI
+          .fromRaw(
+            bytes: inputData,
+            width: int.parse(args['width']),
+            height: int.parse(args['height']),
+            channels:
+                int.parse(args['channels']) == 3 ? Channels.rgb : Channels.rgba,
+            colorspace: int.tryParse(args['colorspace'])!,
+          )
+          .toQOI();
+    }
+  }
+
+  /*final File outputFile = File('outputs/' +
       p.withoutExtension(args['filename']) +
       (mode == Mode.encoding
           ? '.qoi'
@@ -156,30 +198,19 @@ void main(List<String> inputArgs) async {
   late final Uint8List output;
 
   if (mode == Mode.encoding) {
-    output = encode(
-      data: data,
-      width: imageWidth,
-      height: imageHeight,
-      channels: channels,
-      colorspace: colorspace,
-    );
+    output = QOI
+        .fromRaw(
+          bytes: data,
+          width: imageWidth,
+          height: imageHeight,
+          channels: channels == 3 ? Channels.rgb : Channels.rgba,
+          colorspace: colorspace,
+        )
+        .toQOI();
   } else {
-    final QOI decoded = decode(data: data);
-
-    if (args['bin']) {
-      output = decoded.bytes;
-    } else {
-      output = Uint8List.fromList(
-        PngEncoder().encodeImage(
-          Image.fromBytes(
-            decoded.width,
-            decoded.height,
-            decoded.bytes,
-          ),
-        ),
-      );
-    }
-  }
+    final QOI decoded = QOI.fromRaw(data: data);
+    output = args['bin'] ? decoded.toRaw() : decoded.toRaw();
+  }*/
 
   await outputFile.writeAsBytes(output);
 }

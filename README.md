@@ -9,7 +9,7 @@
 
 A Dart implementation of the "[Quite OK Image Format](https://qoiformat.org/)", with a command line interface for console use and a library for use in applications.
 
-Based off of [the official C implementation](https://github.com/phoboslab/qoi/blob/master/qoi.h) and [LowLevelJavaScript's implementation](https://github.com/LowLevelJavaScript/QOI).
+Based off of [the official C implementation](https://github.com/phoboslab/qoi/blob/master/qoi.h) and other implementations.
 
 ## Command Line Interface
 
