@@ -1,3 +1,6 @@
+:: TESTS CLI BASED ON TESTING IMAGES
+:: DOES NOT TEST APPLICATION LIBRARY
+
 @echo off
 
 :: Binary and QOI testing

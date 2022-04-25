@@ -1,12 +1,13 @@
 import 'dart:typed_data';
 
 import 'package:image/image.dart';
-export 'package:image/image.dart' show Channels;
 
 import 'interpreters/decode.dart' as decoder;
 import 'interpreters/encode.dart' as encoder;
 
-/// Represents a QOI file that has just been decoded or needs to be encoded, as listed below
+export 'package:image/image.dart' show Channels;
+
+/// Represents the information found inside a QOI file, whether the file is QOI yet or not
 ///
 /// Can be constructed from a:
 /// * raw binary file, with the [QOI.fromRaw] constructor
@@ -17,17 +18,21 @@ import 'interpreters/encode.dart' as encoder;
 /// * raw binary file, with the [toRaw] method
 /// * PNG image, with the [toPNG] method
 /// * QOI image, with the [toQOI] method
+///
+/// If using Flutter, it is also recommended to import `package:dqoi/flutter_exts.dart` for more functionality.
 class QOI {
+  //! PROPERTIES !//
+
   /// Represents any bytes, not necessarily just QOI format bytes
   ///
   /// Always represents QOI bytes after decoding, and unknown bytes before encoding.
   final Uint8List _bytes;
 
   /// Image width in pixels
-  final int _width;
+  final int width;
 
   /// Image height in pixels
-  final int _height;
+  final int height;
 
   /// Channels in image (RGB or RGBA)
   ///
@@ -39,18 +44,18 @@ class QOI {
   /// 0 represents sRGB with linear alpha; 1 represents all channels alpha.
   final int _colorspace;
 
+  //! DECODERS !//
+
   /// Constructor that does do any automatic decoding
   ///
   /// The input bytes must just be unformatted pixel data (eg. no headers).
   QOI.fromRaw({
     required Uint8List bytes,
-    required int width,
-    required int height,
+    required this.width,
+    required this.height,
     Channels channels = Channels.rgba,
     int colorspace = 0,
   })  : _bytes = bytes,
-        _width = width,
-        _height = height,
         _channels = channels,
         _colorspace = colorspace;
 
@@ -74,11 +79,13 @@ class QOI {
   /// Decode from a QOI image, using the built-in decoder
   static QOI fromQOI(Uint8List raw) => decoder.decode(data: raw);
 
+  //! ENCODERS !//
+
   /// Encode to a QOI image, using the built-in encoder
   Uint8List toQOI() => encoder.encode(
         data: _bytes,
-        width: _width,
-        height: _height,
+        width: width,
+        height: height,
         channels: _channels == Channels.rgb ? 3 : 4,
         colorspace: _colorspace,
       );
@@ -87,8 +94,8 @@ class QOI {
   Uint8List toPNG() => Uint8List.fromList(
         PngEncoder().encodeImage(
           Image.fromBytes(
-            _width,
-            _height,
+            width,
+            height,
             _bytes,
             channels: _channels,
           ),
