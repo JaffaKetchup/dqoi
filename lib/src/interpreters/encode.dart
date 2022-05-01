@@ -67,8 +67,8 @@ Uint8List encode({
           int diffBlue = (color.blue - prevColor.blue) & 255;
           if (diffBlue > 127) diffBlue -= 256;
 
-          int diffRedGreen = diffRed - diffGreen;
-          int diffBlueGreen = diffBlue - diffGreen;
+          final int diffRedGreen = diffRed - diffGreen;
+          final int diffBlueGreen = diffBlue - diffGreen;
 
           if (diffRed > -3 &&
               diffRed < 2 &&

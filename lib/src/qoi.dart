@@ -7,7 +7,7 @@ import 'interpreters/encode.dart' as encoder;
 
 export 'package:image/image.dart' show Channels;
 
-/// Represents the information found inside a QOI file, whether the file is QOI yet or not
+/// Represents the information found inside a QOI image, whether the image is QOI formatted yet, or not
 ///
 /// Can be constructed from a:
 /// * raw binary file, with the [QOI.fromRaw] constructor
@@ -18,8 +18,6 @@ export 'package:image/image.dart' show Channels;
 /// * raw binary file, with the [toRaw] method
 /// * PNG image, with the [toPNG] method
 /// * QOI image, with the [toQOI] method
-///
-/// If using Flutter, it is also recommended to import `package:dqoi/flutter_exts.dart` for more functionality.
 class QOI {
   //! PROPERTIES !//
 
@@ -46,7 +44,7 @@ class QOI {
 
   //! DECODERS !//
 
-  /// Constructor that does do any automatic decoding
+  /// Constructor that does not do any automatic decoding
   ///
   /// The input bytes must just be unformatted pixel data (eg. no headers).
   QOI.fromRaw({

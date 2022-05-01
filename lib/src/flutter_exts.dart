@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 
 import 'qoi.dart';
 
-/// Use [QOI] with extra functions targeted for Flutter users
+/// Extends [QOI] with extra methods targeted for Flutter users
+///
+/// Automatically exported by `package:dqoi/dqoi.dart`.
 extension FlutterQOIExts on QOI {
-  /// Create an image from this QOI data
+  /// Create an [ui.Image] from this QOI data, in future
   ///
-  /// Returned image may be used inside a [RawImage], for example.
+  /// Alternatively, use [toImageWidget] for a more complete solution using [FutureBuilder] to await the rendering.
   Future<ui.Image> toImage() {
     final c = Completer<ui.Image>();
 
@@ -23,20 +25,16 @@ extension FlutterQOIExts on QOI {
     return c.future;
   }
 
+  /// Using QOI data, create a [FutureBuilder] which will show an [ui.Image] once ready
+  ///
+  /// Supply [loadingWidget] to show a custom widget whilst rendering the image. The default is a centered [CircularProgressIndicator]. Note that in the unlikely event of a decoding error, this widget will also be shown.
   FutureBuilder<ui.Image> toImageWidget({
     Widget? loadingWidget,
-  }) {
-    return FutureBuilder<ui.Image>(
-      future: toImage(),
-      builder: (_, img) {
-        if (img.hasData) {
-          return RawImage(
-            image: img.data,
-          );
-        } else {
-          return loadingWidget ?? Center(child: CircularProgressIndicator());
-        }
-      },
-    );
-  }
+  }) =>
+      FutureBuilder<ui.Image>(
+        future: toImage(),
+        builder: (_, img) => img.hasData
+            ? RawImage(image: img.data)
+            : (loadingWidget ?? Center(child: CircularProgressIndicator())),
+      );
 }
