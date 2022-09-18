@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+
+* Updated dependencies
+* Added funding links
+
 ## 1.1.0
 
 * Improved documentation & added changelog

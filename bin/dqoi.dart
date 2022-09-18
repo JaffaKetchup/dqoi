@@ -66,7 +66,7 @@ void main(List<String> inputArgs) async {
     if (e is ArgParserException) {
       print(e.message);
     } else {
-      print('Unknown Error: ' + e.toString());
+      print('Unknown Error: $e');
     }
 
     return;
@@ -124,7 +124,7 @@ void main(List<String> inputArgs) async {
     ),
   );
 
-  await Directory('outputs/' + p.dirname(args['filename']))
+  await Directory('outputs/${p.dirname(args['filename'])}')
       .create(recursive: true);
 
   late final Uint8List output;
