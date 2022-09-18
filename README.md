@@ -1,13 +1,22 @@
 # dqoi ('dart_[qoi](https://github.com/phoboslab/qoi)')
 
-[![Pub.dev](https://img.shields.io/pub/v/dqoi.svg?label=Latest+Version)](https://pub.dev/packages/dqoi) [![points](https://badges.bar/dqoi/pub%20points)](https://pub.dev/packages/dqoi/score) [![likes](https://badges.bar/dqoi/likes)](https://pub.dev/packages/dqoi/score)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-[![stars](https://badgen.net/github/stars/JaffaKetchup/dqoi?label=stars&color=green&icon=github)](https://github.com/JaffaKetchup/dqoi/stargazers) [![Open Issues](https://badgen.net/github/open-issues/JaffaKetchup/dqoi?label=Open+Issues&color=green)](https://GitHub.com/JaffaKetchup/dqoi/issues) [![Open PRs](https://badgen.net/github/open-prs/JaffaKetchup/dqoi?label=Open+PRs&color=green)](https://GitHub.com/JaffaKetchup/dqoi/pulls)
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N151INN)
+[![Pub](https://img.shields.io/pub/v/dqoi.svg?label=Latest+Stable+Version)](https://pub.dev/packages/dqoi) [![likes](https://img.shields.io/pub/likes/dqoi?label=pub.dev+Likes)](https://pub.dev/packages/dqoi/score) [![pub points](https://img.shields.io/pub/points/dqoi?label=pub.dev+Points)](https://pub.dev/packages/dqoi/score)  
+[![GitHub stars](https://img.shields.io/github/stars/JaffaKetchup/dqoi.svg?label=GitHub+Stars)](https://GitHub.com/JaffaKetchup/dqoi/stargazers/) [![GitHub issues](https://img.shields.io/github/issues/JaffaKetchup/dqoi.svg?label=Issues)](https://GitHub.com/JaffaKetchup/dqoi/issues/) [![GitHub PRs](https://img.shields.io/github/issues-pr/JaffaKetchup/dqoi.svg?label=Pull%20Requests)](https://GitHub.com/JaffaKetchup/dqoi/pulls/)
 
 A Dart implementation of the "[Quite OK Image Format](https://qoiformat.org/)", with a command line interface for console use and a library for use in applications.
 
 Based off of [the official C implementation](https://github.com/phoboslab/qoi/blob/master/qoi.h) and other implementations.
+
+## Supporting Me
+
+I'm an under-18 currently living in the UK, and I am in full-time education. I work on this project and all of my others in my spare time, and I currently have no stable income due to my age - although I aspire to work in software/mobile development in the future.  
+If you have any change to spare, I'd be grateful for any amount, big or small :D. Every donation gives me 'mental fuel' to continue this project, and lets me know that I'm doing a good job. I'll be happy to give you a place on the documentation website's credits, and a shoutout in every release/CHANGELOG.
+
+You can read more about me and what I do on my [GitHub Sponsors](https://github.com/sponsors/JaffaKetchup) page, where you can donate as well.
+
+[![Sponsor Me Via GitHub Sponsors](GitHubSponsorsImage.jpg)](https://github.com/sponsors/JaffaKetchup)
+
+Alternatively, if you prefer not to use GitHub Sponsors, please feel free to use my [Ko-fi](https://ko-fi.com/jaffaketchup). Note that the PayPal backend will take a small percentage amount of donations made through this method.
 
 ## Command Line Interface
 
@@ -97,6 +106,6 @@ You can build and install the example application, found in the 'example/' direc
 * How do I pronounce the name of this library?  
   _It's up to you, but I like "decoy" best._
 * Is this a good implementation?  
-  _The outputted QOI files perfectly match the official C implementation's outputs. The re-encoded PNGs don't always match byte-for-byte, but the pixels are always correct_
-* Why wasn't this ported to Dart sooner?  
-  _I'm not sure either. You can see all the other available ports on the [official README](https://github.com/phoboslab/qoi#implementations--bindings-of-qoi)._
+  _The outputted QOI files perfectly match the official C implementation's outputs. Any re-encoded PNGs don't always match byte-for-byte, but the pixels are always correct_
+* Are there any other implementations in different languages?  
+  _Sure there are! You can see all the other available ports on the [official README](https://github.com/phoboslab/qoi#implementations--bindings-of-qoi)._
